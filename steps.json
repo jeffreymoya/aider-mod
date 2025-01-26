@@ -1,0 +1,27 @@
+[
+  {
+    "prompt": "Analyze requirements.txt and list all required technologies. If none specified, suggest appropriate technologies. Return as comma-separated list.",
+    "handler": "create_implementation_standards",
+    "params": {
+      "technology": "python"
+    }
+  },
+  {
+    "prompt": "Create performance standards for python based on best practices",
+    "handler": "create_performance_standards",
+    "params": {
+      "technology": "python"
+    }
+  },
+  {
+    "prompt": "Analyze requirements.txt and create a list of main tasks. Return as JSON array with task_number and task_name",
+    "handler": "create_task_file"
+  },
+  {
+    "prompt": "Define detailed subtasks for task 1: Initial Setup. Return as JSON array with subtask_number and subtask_name",
+    "handler": "create_subtask_spec",
+    "params": {
+      "task_number": "1"
+    }
+  }
+] 

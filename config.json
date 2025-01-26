@@ -1,0 +1,26 @@
+{
+    "directories": {
+        "instructions": "instructions",
+        "tasks": "instructions/tasks",
+        "specs": "instructions/tasks/specs",
+        "standards": "instructions/standards"
+    },
+    "files": {
+        "requirements": "instructions/requirements.txt",
+        "standards": "instructions/standards.txt",
+        "config": "config.json",
+        "steps": "steps.json"
+    },
+    "model": {
+        "name": "gpt-4-turbo",
+        "api_key": null
+    },
+    "io": {
+        "auto_confirm": true
+    },
+    "file_extensions": {
+        "standards": ".md",
+        "tasks": ".md",
+        "specs": ".spec.json"
+    }
+}
