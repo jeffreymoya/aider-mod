@@ -1,0 +1,6 @@
+aider-chat
+dependency-injector>=4.41.0
+pydantic>=2.0.0
+rich>=13.3.5
+structlog>=23.1.0
+tenacity>=8.2.2

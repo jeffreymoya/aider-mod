@@ -47,22 +47,23 @@ class FileSystemStandardsGenerator(StandardsGenerator):
     def __init__(self, config: ConfigModel, logger: structlog.BoundLogger):
         self.config = config
         self.logger = logger
+        self.base_path = Path(os.getcwd())
 
     def create_implementation_standards(self, technology: str, content: str) -> None:
-        filename = Path(self.config.directories["standards"]) / f"{technology}_implementation_standards{self.config.file_extensions['standards']}"
+        filename = self.base_path / self.config.directories["standards"] / f"{technology}_implementation_standards{self.config.file_extensions['standards']}"
         handler = StandardFileHandler(filename)
         handler.write(content)
         self.logger.info("created_implementation_standards", technology=technology)
 
     def create_performance_standards(self, technology: str, content: str) -> None:
-        filename = Path(self.config.directories["standards"]) / f"{technology}_performance_standards{self.config.file_extensions['standards']}"
+        filename = self.base_path / self.config.directories["standards"] / f"{technology}_performance_standards{self.config.file_extensions['standards']}"
         handler = StandardFileHandler(filename)
         handler.write(content)
         self.logger.info("created_performance_standards", technology=technology)
 
 class Container(containers.DeclarativeContainer):
     config = providers.Singleton(
-        lambda: ConfigModel.model_validate_json(Path("config.json").read_text())
+        lambda: ConfigModel.model_validate_json(Path(os.getcwd()) / "config.json").read_text()
     )
     logger = providers.Singleton(
         structlog.wrap_logger,
@@ -158,7 +159,7 @@ class ProjectInitializer:
             raise RuntimeError(f"Failed to initialize Aider: {str(e)}")
 
     def _run_steps(self, step_runner: StepRunner, model_name: Optional[str], api_key: Optional[str]) -> None:
-        steps_file = Path(self.config.files.get("steps", "steps.json"))
+        steps_file = Path(os.getcwd()) / self.config.files.get("steps", "steps.json")
         if not steps_file.exists():
             raise FileNotFoundError(f"Steps file not found: {steps_file}")
 
@@ -171,6 +172,8 @@ class ProjectInitializer:
                     step.model_name = model_name
                 if not step.api_key:
                     step.api_key = api_key
+                # Convert file paths to be relative to current working directory
+                step.files = [str(Path(os.getcwd()) / f) for f in step.files]
                 step_runner.run_step(step)
                 
         except Exception as e:
