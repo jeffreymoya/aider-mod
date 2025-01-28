@@ -2,36 +2,58 @@ For development installation, clone the repository and install in editable mode:
 ```bash
 git clone https://github.com/jeffreymoya/aider-mod.git
 cd aider-mod
-pip install -e .
-```
-
-## Updating
-
-To update to the latest version:
-
-```bash
-pip install --upgrade adrm
 ```
 
 ## Development Setup
 
-1. Create a virtual environment:
+1. Install Poetry (if not already installed):
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-2. Install development dependencies:
+2. Install dependencies and create virtual environment:
 ```bash
-pip install -r requirements.txt
+poetry install
 ```
 
-## Running Tests
+3. Activate the virtual environment:
+```bash
+poetry shell
+```
+
+## Common Commands
 
 ```bash
-pytest tests/
+# Build the project
+poetry build
+
+# Install the project in development mode
+poetry install
+
+# Run tests
+poetry run pytest
+
+# Update dependencies
+poetry update
+
+# Add a new dependency
+poetry add package_name
+
+# Add a development dependency
+poetry add --group dev package_name
 ```
 
 ## License
 
 This project is licensed under the terms of the LICENSE file.
+
+## Features
+- Configuration management
+- Standards generation
+- Step-based workflow execution
+
+## Configuration
+| Environment Variable | Description          |
+|----------------------|----------------------|
+| ADRM_API_KEY         | OpenAI API key       |
+| ADRM_MODEL           | Default model name   |

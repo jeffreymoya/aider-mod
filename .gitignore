@@ -43,7 +43,15 @@ htmlcov/
 # Distribution
 dist/
 build/
+
+# Aider specific
 .aider.chat.history.md
 .aider.input.history
-.aider.tags.cache.v3/cache.db
+.aider.tags.cache.v3/
+aider-mod.sh
+
+# Project specific
 instructions/
+example_workflow.py
+requirements.txt
+setup.py

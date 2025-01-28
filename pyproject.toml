@@ -1,52 +1,39 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[project]
+[tool.poetry]
 name = "adrm"
 version = "0.1.0"
-description = "ADRM - Python package for automated dependency and requirement management"
+description = "A modified version of aider"
+authors = ["Jeffrey Moya <jeffreymoya@example.com>"]
 readme = "README.md"
-requires-python = ">=3.8"
+packages = [{include = "adrm"}]
 license = "MIT"
-authors = [
-    { name = "Jeffrey Moya", email = "jeffrey.moya@gmail.com" },
-]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
+homepage = "https://github.com/jeffreymoya/adrm"
+repository = "https://github.com/jeffreymoya/adrm.git"
 
-dependencies = [
-    "click>=8.0.0",
-    "requests>=2.25.0",
-]
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.1.7"
+requests = "^2.31.0"
+typer = "^0.9.0"
+python-dotenv = "^1.0.0"
+structlog = "^23.1.0"
+rich = "^13.3.5"
+pydantic = "==2.10.5"
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "isort>=5.0.0",
-    "mypy>=1.0.0",
-    "ruff>=0.0.290",
-]
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+pytest-cov = "^4.0.0"
+black = "^23.0.0"
+isort = "^5.0.0"
+mypy = "^1.0.0"
+ruff = "^0.0.290"
+types-requests = "^2.31.0.1"
 
-[project.urls]
-Homepage = "https://github.com/jeffreymoya/adrm"
-Repository = "https://github.com/jeffreymoya/adrm.git"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
-[project.scripts]
+[tool.poetry.scripts]
 adrm = "adrm.main:main"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/adrm"]
 
 [tool.black]
 line-length = 88

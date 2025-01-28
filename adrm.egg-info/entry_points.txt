@@ -1,3 +1,0 @@
-[console_scripts]
-adrm = adrm.main:main
-

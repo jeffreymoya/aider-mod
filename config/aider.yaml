@@ -1,0 +1,18 @@
+aider:
+  model_name: "gpt-4"
+  api_key: null  # Will use ADRM_API_KEY environment variable
+  default_files: []
+  coder:
+    type: "editblock"  # or "wholefile", "udiff", "architect"
+    allow_edits: true
+    auto_confirm: true
+    include_patterns:
+      - "*.py"
+      - "*.js"
+    exclude_patterns:
+      - "*_test.py"
+      - "tests/*"
+  git_enabled: true
+  stream_output: true
+  pretty: true
+  chat_history_file: ".aider.chat.history.md" 

@@ -11,28 +11,7 @@ from adrm.main import (
     StepRunner,
     Step,
 )
-
-@pytest.fixture
-def test_config():
-    return ConfigModel(
-        directories={
-            "standards": "test_standards",
-            "docs": "test_docs"
-        },
-        files={
-            "steps": "test_steps.json"
-        },
-        model={
-            "name": "test-model",
-            "api_key": "test-key"
-        },
-        io={
-            "auto_confirm": True
-        },
-        file_extensions={
-            "standards": ".md"
-        }
-    )
+from pydantic import ValidationError
 
 @pytest.fixture
 def test_logger():
@@ -129,3 +108,16 @@ class TestProjectInitializer:
         
         with pytest.raises(RuntimeError):
             initializer.initialize("test-model", "test-key")
+
+def test_config_model_validation():
+    with pytest.raises(ValidationError):
+        ConfigModel(
+            directories={"invalid": ""},
+            files={},
+            model={},
+            io={},
+            file_extensions={}
+        )
+
+def test_step_runner_with_invalid_api_key():
+    # Should test authentication failure scenarios

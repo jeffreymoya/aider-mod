@@ -1,9 +1,0 @@
-setup.py
-adrm/__init__.py
-adrm/main.py
-adrm.egg-info/PKG-INFO
-adrm.egg-info/SOURCES.txt
-adrm.egg-info/dependency_links.txt
-adrm.egg-info/entry_points.txt
-adrm.egg-info/requires.txt
-adrm.egg-info/top_level.txt

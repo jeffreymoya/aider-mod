@@ -1,28 +1,9 @@
 [
   {
-    "prompt": "Analyze requirements.txt and create implementation standards for the technologies used",
+    "prompt": "Improve requirements and technology stack",
     "files": [
-      "instructions/requirements.txt",
-      "instructions/standards.txt"
+      "requirements.txt"
     ],
-    "allow_edits": true
-  },
-  {
-    "prompt": "Create performance standards based on best practices for each technology identified",
-    "files": [
-      "instructions/standards.txt",
-      "instructions/standards/python_implementation_standards.md"
-    ],
-    "allow_edits": true
-  },
-  {
-    "prompt": "Analyze requirements.txt and create task files for each main task identified",
-    "files": ["instructions/requirements.txt"],
-    "allow_edits": true
-  },
-  {
-    "prompt": "For each task file created, define and create subtask specifications",
-    "files": ["instructions/tasks"],
     "allow_edits": true
   }
 ] 
