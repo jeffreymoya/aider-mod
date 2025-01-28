@@ -21,37 +21,33 @@ wheels/
 *.egg
 
 # Virtual Environment
-.env
-.venv
-env/
 venv/
+env/
 ENV/
+.env
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+.project
+.pydevproject
+.settings/
 
 # Testing
 .coverage
-htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
 .pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Distribution
-dist/
-build/
-
-# Aider specific
-.aider.chat.history.md
-.aider.input.history
-.aider.tags.cache.v3/
-aider-mod.sh
+htmlcov/
 
 # Project specific
-instructions/
-example_workflow.py
-requirements.txt
-setup.py
+.aider.chat.history.md
+.aider.tags.cache.v3/
+.aider.input.history
+
+# Logs
+*.log
+logs/
