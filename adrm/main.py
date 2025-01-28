@@ -12,7 +12,7 @@ def get_config_locations() -> dict:
     package_dir = Path(__file__).parent.parent
     config_locations = {
         "aider_config": package_dir / "config" / "aider.yaml",
-        "steps_config": package_dir / "steps.json",
+        "steps_config": package_dir / "config" / "steps.json",
     }
     return {k: str(v.absolute()) for k, v in config_locations.items()}
 

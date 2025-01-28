@@ -16,7 +16,7 @@ def get_config_files() -> dict:
     workspace_root = Path(__file__).parent.parent
     return {
         "config/config.yaml": "config/config.yaml",
-        "steps.json": "steps.json"
+        "config/steps.json": "config/steps.json"
     }
 
 def update_config_files(site_packages_path: Path, force: bool = False) -> None:

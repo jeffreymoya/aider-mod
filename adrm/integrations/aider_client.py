@@ -24,7 +24,26 @@ class AiderClient:
         self.config = config
         self.logger = logger
         self.model = Model(config.model_name)
-        self.model.api_key = config.api_key or os.getenv("ADRM_API_KEY")
+        api_key = config.api_key or os.getenv("ADRM_API_KEY")
+        if not api_key:
+            error_message = """
+API key not found. Please set your API key using one of these methods:
+
+1. Environment variable:
+   export ADRM_API_KEY='your-api-key'
+
+2. Configuration file:
+   Update config/config.yaml with your API key
+
+3. Command line:
+   adrm init --model gpt-4 --api-key your-api-key
+
+You can get your API key from: https://platform.openai.com/api-keys
+"""
+            self.logger.error("api_key_not_found")
+            raise ValueError(error_message)
+            
+        self.model.api_key = api_key
         self.console = console or Console()
         self.io = InputOutput(
             yes=config.coder.auto_confirm,
