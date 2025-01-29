@@ -3,14 +3,11 @@ from pathlib import Path
 import json
 import structlog
 from rich.console import Console
-from adrm.main import (
-    ConfigModel,
-    StandardFileHandler,
-    FileSystemStandardsGenerator,
-    ProjectInitializer,
-    StepRunner,
-    Step,
-)
+from adrm.core.models import ConfigModel, Step
+from adrm.infrastructure.file_handlers import LocalFileHandler as StandardFileHandler
+from adrm.services.standards import FileSystemStandardsGenerator
+from adrm.services.initializer import ProjectInitializer
+from adrm.services.step_runner import StepRunner
 from pydantic import ValidationError
 
 @pytest.fixture
@@ -120,4 +117,80 @@ def test_config_model_validation():
         )
 
 def test_step_runner_with_invalid_api_key():
-    # Should test authentication failure scenarios
+    config = ConfigModel(
+        directories={"test": "test"},
+        files={"test": "test"},
+        model={"test": "test"},
+        io={"test": "test"},
+        file_extensions={"test": ["test"]}
+    )
+    logger = structlog.wrap_logger(structlog.PrintLogger())
+    runner = StepRunner(config, logger)
+    step = Step(
+        prompt="Test prompt",
+        files=["test.py"],
+        model_name="gpt-4",
+        api_key="invalid_key"
+    )
+    
+    with pytest.raises(RuntimeError, match="Authentication failed"):
+        runner.run_step(step)
+
+def test_step_runner_with_valid_step():
+    config = ConfigModel(
+        directories={"test": "test"},
+        files={"test": "test"},
+        model={"test": "test"},
+        io={"test": "test"},
+        file_extensions={"test": ["test"]}
+    )
+    logger = structlog.wrap_logger(structlog.PrintLogger())
+    runner = StepRunner(config, logger)
+    step = Step(
+        prompt="Test prompt",
+        files=["test.py"],
+        model_name="gpt-4",
+        api_key="valid_key",
+        response="Test response"
+    )
+    
+    result = runner.run_step(step)
+    assert result == "Test response"
+
+def test_project_initializer_with_valid_config(temp_dir, test_logger, test_console):
+    config = ConfigModel(
+        directories={"standards": str(temp_dir)},
+        files={"steps": str(temp_dir / "steps.json")},
+        model={"test": "test"},
+        io={"test": "test"},
+        file_extensions={"test": ["test"]}
+    )
+    
+    (temp_dir / "steps.json").write_text(json.dumps([
+        {
+            "prompt": "Test prompt",
+            "files": ["test.py"],
+            "model_name": "gpt-4",
+            "api_key": "test_key"
+        }
+    ]))
+    
+    generator = FileSystemStandardsGenerator(config, test_logger)
+    initializer = ProjectInitializer(config, generator, test_logger, test_console)
+    
+    result = initializer.initialize("test-model", "test-key")
+    assert result is None
+
+def test_file_system_standards_generator_with_invalid_directory(test_logger):
+    config = ConfigModel(
+        directories={"standards": "/nonexistent/path"},
+        files={"test": "test"},
+        model={"test": "test"},
+        io={"test": "test"},
+        file_extensions={"test": ["test"]}
+    )
+    
+    generator = FileSystemStandardsGenerator(config, test_logger)
+    
+    with pytest.raises(RuntimeError, match="Failed to create standards"):
+        generator.create_implementation_standards("python", "Test standards")
