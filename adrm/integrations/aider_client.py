@@ -47,8 +47,7 @@ You can get your API key from: https://platform.openai.com/api-keys
         self.console = console or Console()
         self.io = InputOutput(
             yes=config.coder.auto_confirm,
-            pretty=config.pretty,
-            stream=config.stream_output
+            pretty=config.pretty
         )
 
     def _get_coder_class(self) -> Type[Coder]:

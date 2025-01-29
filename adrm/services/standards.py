@@ -1,6 +1,6 @@
 from pathlib import Path
 import structlog
-from adrm.core.interfaces import StandardsGenerator
+from adrm.core.interfaces import StandardsGenerator, FileHandler
 from adrm.core.models import ConfigModel
 from adrm.infrastructure.file_handlers import LocalFileHandler
 
@@ -9,11 +9,15 @@ def create_standard_file(standard_type: str, technology: str, content: str):
     Path(path).write_text(content)
 
 class FileSystemStandardsGenerator(StandardsGenerator):
-    def __init__(self, config: ConfigModel, logger: structlog.BoundLogger):
+    def __init__(
+        self,
+        config: ConfigModel,
+        logger: structlog.BoundLogger,
+        file_handler: FileHandler
+    ):
         self.config = config
         self.logger = logger
-        self.base_path = Path.cwd()
-        self.file_handler = LocalFileHandler()
+        self.file_handler = file_handler
 
     def create_implementation_standards(self, technology: str, content: str) -> None:
         filename = self.base_path / self.config.directories["standards"] / f"{technology}_implementation_standards{self.config.file_extensions['standards']}"

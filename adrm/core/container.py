@@ -4,6 +4,13 @@ from rich.console import Console
 
 from adrm.core.models import ConfigModel
 from adrm.services.standards import FileSystemStandardsGenerator
+from adrm.core.interfaces import (
+    FileHandler,
+    StandardsGenerator,
+    StepRunnerClient
+)
+from adrm.integrations.aider_client import AiderClient
+from adrm.infrastructure.file_handlers import LocalFileHandler
 
 # The container setup seems excessive for current needs
 # Consider removing dependency-injector package
@@ -23,14 +30,15 @@ def AppContainer():
     
     console = Console()
     
-    standards_generator = FileSystemStandardsGenerator(
-        config=config,
-        logger=logger
-    )
+    file_handler = LocalFileHandler()
+    aider_client = AiderClient(config, logger)
+    standards_generator = FileSystemStandardsGenerator(config, logger, file_handler)
     
     return {
         'config': config,
         'logger': logger,
         'console': console,
-        'standards_generator': standards_generator
+        'standards_generator': standards_generator,
+        'file_handler': file_handler,
+        'aider_client': aider_client
     } 

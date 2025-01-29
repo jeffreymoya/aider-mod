@@ -15,12 +15,14 @@ class ProjectInitializer:
         config: ConfigModel,
         standards_generator: StandardsGenerator,
         logger: structlog.BoundLogger,
-        console: Console
+        console: Console,
+        step_runner: StepRunner
     ):
         self.config = config
         self.standards_generator = standards_generator
         self.logger = logger
         self.console = console
+        self.step_runner = step_runner
 
     def _validate_model_config(self, model_name: Optional[str], api_key: Optional[str]) -> None:
         if model_name and not isinstance(model_name, str):
@@ -37,14 +39,13 @@ class ProjectInitializer:
     def _initialize_aider(self, model_name: Optional[str], api_key: Optional[str]) -> None:
         try:
             self._setup_directories()
-            step_runner = StepRunner(self.config, self.logger)
-            self._run_steps(step_runner, model_name, api_key)
+            self._run_steps(model_name, api_key)
             
         except Exception as e:
             self.logger.error("aider_initialization_failed", error=str(e))
             raise RuntimeError(f"Failed to initialize Aider: {str(e)}")
 
-    def _run_steps(self, step_runner: StepRunner, model_name: Optional[str], api_key: Optional[str]) -> None:
+    def _run_steps(self, model_name: Optional[str], api_key: Optional[str]) -> None:
         steps_file = Path.cwd() / self.config.files.get("steps", "steps.json")
         if not steps_file.exists():
             raise FileNotFoundError(f"Steps file not found: {steps_file}")
@@ -59,7 +60,7 @@ class ProjectInitializer:
                 if not step.api_key:
                     step.api_key = api_key
                 step.files = [str(Path.cwd() / f) for f in step.files]
-                step_runner.run_step(step)
+                self.step_runner.run_step(step)
                 
         except Exception as e:
             self.logger.error("steps_execution_failed", error=str(e))
