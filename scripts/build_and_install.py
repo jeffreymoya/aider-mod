@@ -3,6 +3,9 @@ import subprocess
 import sys
 from pathlib import Path
 import shutil
+import hashlib
+import json
+from pkg_resources import get_distribution
 
 def run_command(command: str, allow_non_zero_exit: bool = False) -> bool:
     try:
@@ -37,28 +40,93 @@ def update_config_files(project_root: Path, site_packages: Path) -> None:
         else:
             print(f"Warning: Source file {src_path} not found")
 
+def get_source_files_hash(project_root: Path) -> str:
+    source_files = []
+    for ext in ('*.py', '*.yaml', '*.json'):
+        source_files.extend(project_root.rglob(ext))
+    
+    hasher = hashlib.md5()
+    for file in sorted(source_files):
+        if 'dist' not in str(file) and 'build' not in str(file):
+            hasher.update(file.read_bytes())
+    return hasher.hexdigest()
+
+def get_package_dependencies(project_root: Path) -> dict:
+    pyproject_file = project_root / "pyproject.toml"
+    if not pyproject_file.exists():
+        return {}
+    
+    try:
+        result = subprocess.run(["poetry", "export", "--format", "requirements.txt"], 
+                              capture_output=True, text=True, check=True)
+        deps = {}
+        for line in result.stdout.splitlines():
+            if "==" in line:
+                name, version = line.split("==", 1)
+                deps[name] = version.split(";")[0]  # Remove any platform specifiers
+        return deps
+    except subprocess.CalledProcessError:
+        return {}
+
+def check_dependencies_changed(project_root: Path, cache_file: Path) -> bool:
+    current_deps = get_package_dependencies(project_root)
+    deps_cache_file = cache_file.with_suffix('.deps')
+    
+    if not deps_cache_file.exists():
+        deps_cache_file.write_text(json.dumps(current_deps))
+        return True
+        
+    cached_deps = json.loads(deps_cache_file.read_text())
+    if current_deps != cached_deps:
+        deps_cache_file.write_text(json.dumps(current_deps))
+        return True
+        
+    return False
+
 def main():
-    # Get the project root directory
     project_root = Path(__file__).parent.parent
+    cache_file = project_root / '.build_cache'
     
-    print("\n1. Building package...")
-    if not run_command("poetry build"):
-        sys.exit(1)
+    print("\n1. Checking build cache...")
+    current_hash = get_source_files_hash(project_root)
     
-    print("\n2. Installing package...")
+    should_build = True
+    if cache_file.exists():
+        cached_hash = cache_file.read_text().strip()
+        if cached_hash == current_hash:
+            print("No changes detected, skipping build...")
+            should_build = False
+    
+    if should_build:
+        print("\n2. Building package...")
+        if not run_command("poetry build"):
+            sys.exit(1)
+        cache_file.write_text(current_hash)
+    
+    print("\n3. Installing package...")
     wheel_file = next(project_root.glob("dist/*.whl"))
-    if not run_command(f"pip install {wheel_file} --force-reinstall"):
+    
+    # Check if dependencies have changed
+    deps_changed = check_dependencies_changed(project_root, cache_file)
+    install_cmd = f"pip install {wheel_file}"
+    if deps_changed:
+        print("Dependencies have changed, forcing reinstall...")
+        install_cmd += " --force-reinstall"
+    else:
+        print("Dependencies unchanged, performing minimal install...")
+    
+    if not run_command(install_cmd):
         sys.exit(1)
         
     print("\n✨ Build and installation completed successfully!")
     
     # Update configuration files
-    print("\n3. Updating configuration files...")
+    print("\n4. Updating configuration files...")
     site_packages = Path.home() / ".local" / "lib" / "python3.10" / "site-packages"
     update_config_files(project_root, site_packages)
     
     # Test the installation
-    print("\n4. Testing installation...")
+    print("\n5. Testing installation...")
     if run_command("adrm config"):
         print("\n🎉 Installation verified successfully!")
     else:
